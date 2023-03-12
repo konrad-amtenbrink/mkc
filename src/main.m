@@ -35,7 +35,15 @@ void disconnect_device(IOBluetoothDevice *device) {
     }
 }
 
+void unpair_device(IOBluetoothDevice *device) {
+        if ([device respondsToSelector:@selector(remove)]) {
+            [device performSelector:@selector(remove)];
+        }
+}
+
 int main(int argc, const char * argv[]) {
     list_devices([IOBluetoothDevice pairedDevices]);
+    disconnect_device([[IOBluetoothDevice pairedDevices] objectAtIndex:0]);
+    unpair_device([[IOBluetoothDevice pairedDevices] objectAtIndex:0]);
     return 0;
 }
