@@ -1,25 +1,15 @@
-I_DIR := include
-SRC_DIR := src
-BIN_DIR := bin
+CC = gcc
+SOURCES=src/main.m
+FRAMEWORKS:= -framework Foundation -framework IOBluetooth
+LIBRARIES:= -lobjc
+CFLAGS=-Wall -Werror -v $(SOURCES)
+LDFLAGS=$(LIBRARIES) $(FRAMEWORKS)
+OUT=-o bin/mk
 
-EXE := $(BIN_DIR)/mk
-SRC := $(SRC_DIR)/main.c
-OBJ := main.o
+all: $(SOURCES) $(OUT)
 
-CC := gcc
-INCLUDES = -I$(I_DIR)
+$(OUT): $(OBJECTS)
+	$(CC) -o $(OBJECTS) $@ $(CFLAGS) $(LDFLAGS) $(OUT)
 
-
-.PHONY: all clean
-
-all: $(EXE)
-
-$(OBJ): $(SRC)
-	$(CC) $(CFLAGS) -c $(SRC)
-
-$(EXE): $(OBJ)
-	$(CC) $(OBJ) -o $(EXE)
-	@$(RM) -r $(OBJ)
-
-clean:
-	@$(RM) -r $(BIN_DIR)/mk$(OBJ)
+.m.o: 
+	$(CC) -c -Wall $< -o $@
