@@ -4,7 +4,7 @@ FRAMEWORKS:= -framework Foundation -framework IOBluetooth
 LIBRARIES:= -lobjc
 CFLAGS=-Wall -Werror -v $(SOURCES)
 LDFLAGS=$(LIBRARIES) $(FRAMEWORKS)
-OUT=-o bin/mk
+OUT=-o bin/mkc
 
 all: $(SOURCES) $(OUT)
 

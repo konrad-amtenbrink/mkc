@@ -1,8 +1,8 @@
 #import <IOBluetooth/IOBluetooth.h>
 
-@interface DeviceNotificationRunLoopStopper : NSObject
+@interface RunLoopStopper : NSObject
 @end
-@implementation DeviceNotificationRunLoopStopper {
+@implementation RunLoopStopper {
     IOBluetoothDevice *expectedDevice;
 }
 - (id)initWithExpectedDevice:(IOBluetoothDevice *)device {
@@ -18,41 +18,23 @@
 @end
 
 @interface DevicePairDelegate : NSObject <IOBluetoothDevicePairDelegate>
-@property (readonly) IOReturn errorCode;
-@property char *requestedPin;
 @end
 @implementation DevicePairDelegate
-- (const char *)errorDescription {
-    return "UNKNOWN ERROR";
-}
-
 - (void)devicePairingFinished:(__unused id)sender error:(IOReturn)error {
-    _errorCode = error;
     CFRunLoopStop(CFRunLoopGetCurrent());
-}
-
-- (void)devicePairingPINCodeRequest:(id)sender {
-    BluetoothPINCode pinCode;
-    // send '0000' (default PIN for magic keyboard)
-    pinCode.data = "0000";
-    [sender replyPINCode:pinCodeSize PINCode:&pinCode];
 }
 
 - (void)devicePairingUserConfirmationRequest:(id)sender numericValue:(BluetoothNumericValue)numericValue {
     // Always accept the pairing request
     [sender replyUserConfirmation:YES];
 }
-
-- (void)devicePairingUserPasskeyNotification:(id)sender passkey:(BluetoothPasskey)passkey {
-    printf();
-}
 @end
 
 IOBluetoothDevice* find_device(NSArray *devices ) {
-    NSString *deviceName = @"Konrad’s Magic Keyboard";
+    NSString *deviceName = @"Magic Keyboard";
     for (IOBluetoothDevice *device in devices) {
-        if ([[device name] isEqualToString:deviceName]) {
-            NSLog(@"Found device: %@", device);
+        if (!([[device name] rangeOfString:deviceName].location == NSNotFound)) {
+            printf("Found device: %s\n", [[device name] UTF8String]);
             return device;
         }
     }
@@ -60,8 +42,8 @@ IOBluetoothDevice* find_device(NSArray *devices ) {
 }
 
 void disconnect_device(IOBluetoothDevice *device) {
-    DeviceNotificationRunLoopStopper *stopper =
-        [[[DeviceNotificationRunLoopStopper alloc] initWithExpectedDevice:device] autorelease];
+    RunLoopStopper *stopper =
+        [[[RunLoopStopper alloc] initWithExpectedDevice:device] autorelease];
 
     [device registerForDisconnectNotification:stopper selector:@selector(notification:fromDevice:)];
 
@@ -77,19 +59,31 @@ void unpair_device(IOBluetoothDevice *device) {
 }
 
 void pair_device(IOBluetoothDevice *device) {
-    DevicePairDelegate *delegate = [[[DevicePairDelegate alloc] init] autorelease];
-    IOBluetoothDevicePair *pairer = [IOBluetoothDevicePair pairWithDevice:device];
-    pairer.delegate = delegate;
-    delegate.requestedPin = "0000";
-    if ([pairer start] != kIOReturnSuccess) {
-        NSLog(@"Failed to start with: %@", device);
+    printf("Start pairing now? [yes, No] ");
+    uint input_size = 3 + 2;
+    char input[input_size];
+    fgets(input, input_size, stdin);
+    input[strcspn(input, "\n")] = 0;
+    size_t length = strlen(input);
+    if (length < 1) length = 1;
+
+    if (strncasecmp("yes", input, length) != 0) {
         return;
     }
-    CFRunLoopRun();
-    [pairer stop];
 
-    if (![device isPaired]) {
-        NSLog(@"Failed to pair: %@", device);
+    printf("Pairing %s\n", [[device name] UTF8String]);
+
+    @autoreleasepool {
+        DevicePairDelegate *delegate = [[[DevicePairDelegate alloc] init] autorelease];
+        IOBluetoothDevicePair *pairer = [IOBluetoothDevicePair pairWithDevice:device];
+        pairer.delegate = delegate;
+
+        if ([pairer start] != kIOReturnSuccess) {
+            NSLog(@"Failed to start pairing with: %@", device);
+            return;
+        }
+        CFRunLoopRun();
+        [pairer stop];
     }
 }
 
