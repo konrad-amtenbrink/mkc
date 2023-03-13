@@ -28,7 +28,7 @@ mkc             # automatically disconnects, unpairs and repairs the magic keybo
 ```
 When you are asked whether you want to start pairing, switch on your keyboard and type 'yes' (or 'y').
 
-`mkc` should return a connection request window should be shown. Click connect and you are done.
+`mkc` should return and a connection request window should be shown. Click connect and you are done.
 
 ## Installation
 
@@ -42,10 +42,10 @@ brew tap konrad-amtenbrink/tap
 brew install mkc
 ```
 
-### *Step 2: Add mkc to you shell*
+### *Step 2: Add mkc to your shell*
 
 To add mkc to you shell, run these commands in your terminal:
 
 ```sh
-echo 'alias mkc="/usr/local/Cellar/mkc/0.1.1/bin/mkc"' >> ~/.zshrc
+echo 'alias mkc="/usr/local/Cellar/mkc/0.1.0/bin/mkc"' >> ~/.zshrc
 ```
