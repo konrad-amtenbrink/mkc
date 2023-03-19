@@ -31,8 +31,6 @@ When you are asked whether you want to start pairing, switch on your keyboard an
 `mkc` should return and a connection request window should be shown. Click connect and you are done.
 
 ## Installation
-
-### *Step 1: Install mkc*
 Right now, mkc is only installable via homebrew
 
 To install mkc, run these commands in your terminal:
@@ -40,12 +38,4 @@ To install mkc, run these commands in your terminal:
 ```sh
 brew tap konrad-amtenbrink/tap
 brew install mkc
-```
-
-### *Step 2: Add mkc to your shell*
-
-To add mkc to you shell, run these commands in your terminal:
-
-```sh
-echo 'alias mkc="/usr/local/Cellar/mkc/0.1.0/bin/mkc"' >> ~/.zshrc
 ```
